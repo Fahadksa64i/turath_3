@@ -1,7 +1,7 @@
+// add_product_page.dart - الإصدار المعدل
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:io';
 
 class AddProductPage extends StatefulWidget {
@@ -21,7 +21,7 @@ class _AddProductPageState extends State<AddProductPage> {
   String? _selectedLocation;
   String? _selectedCategory;
   List<File> _selectedImages = [];
-  List<String> _currentImageUrls = []; // لحفظ روابط الصور الحالية
+  List<String> _currentImageUrls = [];
   bool _isLoading = false;
 
   final List<String> _categories = [
@@ -64,7 +64,6 @@ class _AddProductPageState extends State<AddProductPage> {
       _selectedLocation = widget.productToEdit!['location'];
       _selectedCategory = widget.productToEdit!['category'];
 
-      // تحميل روابط الصور الحالية
       final imageUrls = widget.productToEdit!['image_urls'] as String;
       if (imageUrls.isNotEmpty) {
         _currentImageUrls = imageUrls.split('|');
@@ -102,62 +101,10 @@ class _AddProductPageState extends State<AddProductPage> {
 
     setState(() => _isLoading = true);
     try {
-      final supabase = Supabase.instance.client;
-      final user = supabase.auth.currentUser;
-      if (user == null) throw Exception('يجب تسجيل الدخول أولاً');
-
-      List<String> imageUrls = List.from(_currentImageUrls);
-
-      for (var image in _selectedImages) {
-        final fileExt = image.path.split('.').last;
-        final fileName = '${user.id}_${DateTime.now().millisecondsSinceEpoch}.$fileExt';
-        final cleanFileName = fileName.replaceAll(' ', '_');
-
-        await supabase.storage
-            .from('productimages')
-            .upload(
-          cleanFileName,
-          image,
-          fileOptions: FileOptions(contentType: 'image/$fileExt'),
-        );
-
-        final imageUrlResponse = await supabase.storage
-            .from('productimages')
-            .createSignedUrl(cleanFileName, 60 * 60 * 24 * 365 * 10);
-
-        imageUrls.add(imageUrlResponse);
-      }
-
-      if (widget.productToEdit != null) {
-        // تحديث الإعلان
-        await supabase.from('products').update({
-          'title': _titleController.text,
-          'description': _descriptionController.text,
-          'price': _priceController.text.isNotEmpty ? double.parse(_priceController.text) : null,
-          'location': _selectedLocation,
-          'category': _selectedCategory,
-          'image_urls': imageUrls.join('|'),
-          'updated_at': DateTime.now().toIso8601String(),
-        }).eq('id', widget.productToEdit!['id']);
-      } else {
-        // إضافة إعلان جديد
-        await supabase.from('products').insert({
-          'title': _titleController.text,
-          'description': _descriptionController.text,
-          'price': _priceController.text.isNotEmpty ? double.parse(_priceController.text) : null,
-          'location': _selectedLocation,
-          'category': _selectedCategory,
-          'image_urls': imageUrls.join('|'),
-          'user_id': user.id,
-          'created_at': DateTime.now().toIso8601String(),
-        });
-      }
-
+      // تم إزالة كود Supabase
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(widget.productToEdit != null
-              ? 'تم تحديث الإعلان بنجاح'
-              : 'تم رفع الإعلان بنجاح')),
+          const SnackBar(content: Text('تم حفظ البيانات محلياً')),
         );
         Navigator.of(context).pop();
       }
@@ -200,7 +147,6 @@ class _AddProductPageState extends State<AddProductPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // معرض الصور
               Text('صور الإعلان (${allImages.length}/10)',
                   style: GoogleFonts.tajawal(
                     fontSize: 16,
@@ -208,7 +154,6 @@ class _AddProductPageState extends State<AddProductPage> {
                   )),
               const SizedBox(height: 10),
 
-              // عرض الصور المختارة والموجودة
               if (allImages.isNotEmpty)
                 SizedBox(
                   height: 120,
@@ -274,7 +219,6 @@ class _AddProductPageState extends State<AddProductPage> {
                   ),
                 ),
 
-              // زر إضافة الصور
               ElevatedButton.icon(
                 icon: const Icon(Icons.add_photo_alternate, color: Colors.white),
                 label: Text(
@@ -308,10 +252,6 @@ class _AddProductPageState extends State<AddProductPage> {
                 ),
               const SizedBox(height: 20),
 
-              // باقي الحقول (العنوان، الوصف، التصنيف، الموقع، السعر)
-              // ... (نفس الحقول الموجودة في الملف الأصلي)
-
-              // عنوان الإعلان
               TextFormField(
                 controller: _titleController,
                 decoration: InputDecoration(
@@ -332,7 +272,6 @@ class _AddProductPageState extends State<AddProductPage> {
               ),
               const SizedBox(height: 15),
 
-              // وصف الإعلان
               TextFormField(
                 controller: _descriptionController,
                 maxLines: 4,
@@ -354,7 +293,6 @@ class _AddProductPageState extends State<AddProductPage> {
               ),
               const SizedBox(height: 15),
 
-              // التصنيف
               DropdownButtonFormField<String>(
                 value: _selectedCategory,
                 decoration: InputDecoration(
@@ -386,7 +324,6 @@ class _AddProductPageState extends State<AddProductPage> {
               ),
               const SizedBox(height: 15),
 
-              // الموقع
               DropdownButtonFormField<String>(
                 value: _selectedLocation,
                 decoration: InputDecoration(
@@ -418,7 +355,6 @@ class _AddProductPageState extends State<AddProductPage> {
               ),
               const SizedBox(height: 15),
 
-              // السعر (اختياري)
               TextFormField(
                 controller: _priceController,
                 keyboardType: TextInputType.number,
@@ -434,7 +370,6 @@ class _AddProductPageState extends State<AddProductPage> {
               ),
               const SizedBox(height: 30),
 
-              // زر رفع الإعلان
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,

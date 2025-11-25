@@ -1,8 +1,6 @@
+// my_ads_page.dart - الإصدار المعدل
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:test2/pages/my_product_details_page.dart';
-import 'package:test2/pages/add_product_page.dart';
 
 class MyAdsPage extends StatefulWidget {
   const MyAdsPage({super.key});
@@ -15,7 +13,6 @@ class _MyAdsPageState extends State<MyAdsPage> {
   List<Map<String, dynamic>> _userProducts = [];
   bool _isLoading = true;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
-  final _supabase = Supabase.instance.client;
 
   @override
   void initState() {
@@ -31,18 +28,10 @@ class _MyAdsPageState extends State<MyAdsPage> {
 
   Future<void> _fetchUserProducts() async {
     try {
-      final user = _supabase.auth.currentUser;
-      if (user != null) {
-        final response = await _supabase
-            .from('products')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', ascending: false);
-
-        setState(() {
-          _userProducts = List<Map<String, dynamic>>.from(response);
-        });
-      }
+      // تم إزالة كود Supabase
+      setState(() {
+        _userProducts = [];
+      });
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -52,6 +41,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
     }
   }
 
+  // ... باقي الدوال بدون تغيير
   Future<void> _handleRefresh() async {
     await _fetchUserProducts();
   }
@@ -145,28 +135,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
 
         return GestureDetector(
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MyProductDetailsPage(
-                  product: product,
-                  onDelete: () {
-                    _fetchUserProducts();
-                    Navigator.pop(context);
-                  },
-                  onUpdate: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AddProductPage(
-                          productToEdit: product,
-                        ),
-                      ),
-                    ).then((_) => _fetchUserProducts());
-                  },
-                ),
-              ),
-            );
+            // تم إزالة التنقل لصفحة التفاصيل
           },
           child: Card(
             elevation: 4,

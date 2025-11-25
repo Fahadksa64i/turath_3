@@ -1,3 +1,4 @@
+// signup_screen.dart - الإصدار المعدل
 import 'package:flutter/material.dart';
 import 'package:test2/auth_service.dart';
 import 'package:test2/screen/login_screen.dart';
@@ -71,7 +72,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   Expanded(
                     child: GestureDetector(
-                      onTap: () {}, // لا تفعل شيئًا لأننا بالفعل في شاشة signup
+                      onTap: () {},
                       child: Container(
                         decoration: BoxDecoration(
                           color: Colors.white,

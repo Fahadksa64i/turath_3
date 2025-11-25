@@ -1,6 +1,6 @@
+// home_screen.dart - الإصدار المعدل
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:test2/pages/add_product_page.dart';
 import 'package:test2/pages/favorites_page.dart';
 import 'package:test2/pages/my_ads_page.dart';
@@ -20,39 +20,20 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String _searchQuery = '';
 
-  late final Stream<Map<String, dynamic>> _profileStream;
-  String userName = '';
+  String userName = 'مستخدم';
   String? userImageUrl;
 
   @override
   void initState() {
     super.initState();
-    final user = Supabase.instance.client.auth.currentUser;
-    _profileStream = Supabase.instance.client
-        .from('profiles')
-        .stream(primaryKey: ['id'])
-        .eq('id', user!.id)
-        .map((data) => data.first);
-
     fetchUserData();
   }
 
   Future<void> fetchUserData() async {
-    final supabase = Supabase.instance.client;
-    final user = supabase.auth.currentUser;
-
-    if (user != null) {
-      final response = await supabase
-          .from('profiles')
-          .select('username, avatar_url')
-          .eq('id', user.id)
-          .single();
-
-      setState(() {
-        userName = response['username'] ?? 'بدون اسم';
-        userImageUrl = response['avatar_url'];
-      });
-    }
+    // تم إزالة كود Supabase
+    setState(() {
+      userName = 'مستخدم';
+    });
   }
 
   @override
@@ -195,49 +176,40 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color(0xFFEEDDCF),
         child: Column(
           children: [
-            StreamBuilder<Map<String, dynamic>>(
-              stream: _profileStream,
-              builder: (context, snapshot) {
-                final data = snapshot.data;
-                final currentImageUrl = data?['avatar_url'];
-                final currentUserName = data?['username'] ?? userName;
-
-                return Container(
-                  padding: const EdgeInsets.only(top: 40, bottom: 10),
-                  width: double.infinity,
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 57,
-                        backgroundColor: Colors.transparent,
-                        backgroundImage: currentImageUrl != null
-                            ? NetworkImage(currentImageUrl)
-                            : null,
-                        child: currentImageUrl == null
-                            ? const Icon(Icons.person, size: 40, color: Color(0xFF6C4422))
-                            : null,
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        currentUserName.isNotEmpty ? currentUserName : 'جارٍ التحميل...',
-                        style: GoogleFonts.tajawal(
-                          color: const Color(0xFF6C4422),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24,
-                        ),
-                      ),
-                      const SizedBox(height: 10), // مسافة قبل الخط
-                      Divider(
-                        height: 0,
-                        thickness: 2,
-                        color: const Color(0xFF6C4422).withOpacity(0.5),
-                        indent: 40, // بداية الخط من الجهة اليمنى
-                        endIndent: 40, // نهاية الخط من الجهة اليسرى
-                      ),
-                    ],
+            Container(
+              padding: const EdgeInsets.only(top: 40, bottom: 10),
+              width: double.infinity,
+              child: Column(
+                children: [
+                  CircleAvatar(
+                    radius: 57,
+                    backgroundColor: Colors.transparent,
+                    backgroundImage: userImageUrl != null
+                        ? NetworkImage(userImageUrl!)
+                        : null,
+                    child: userImageUrl == null
+                        ? const Icon(Icons.person, size: 40, color: Color(0xFF6C4422))
+                        : null,
                   ),
-                );
-              },
+                  const SizedBox(height: 10),
+                  Text(
+                    userName,
+                    style: GoogleFonts.tajawal(
+                      color: const Color(0xFF6C4422),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Divider(
+                    height: 0,
+                    thickness: 2,
+                    color: const Color(0xFF6C4422).withOpacity(0.5),
+                    indent: 40,
+                    endIndent: 40,
+                  ),
+                ],
+              ),
             ),
             ListTile(
               leading: const Icon(Icons.person, color: Color(0xFF6C4422)),

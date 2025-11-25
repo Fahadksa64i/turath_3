@@ -1,7 +1,6 @@
+// products_list_page.dart - الإصدار المعدل
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:test2/pages/product_details_page.dart';
 
 class ProductsList extends StatefulWidget {
   final String searchQuery;
@@ -40,15 +39,10 @@ class _ProductsListState extends State<ProductsList> {
 
   Future<void> _fetchProducts() async {
     try {
-      final supabase = Supabase.instance.client;
-      final response = await supabase
-          .from('products')
-          .select('*')
-          .order('created_at', ascending: false);
-
+      // تم إزالة كود Supabase
       setState(() {
-        _products = List<Map<String, dynamic>>.from(response);
-        _filteredProducts = List.from(_products);
+        _products = [];
+        _filteredProducts = [];
       });
     } catch (e) {
       if (mounted) {
@@ -72,6 +66,7 @@ class _ProductsListState extends State<ProductsList> {
     await _fetchProducts();
   }
 
+  // ... باقي الدوال بدون تغيير
   String? _getFirstImageUrl(String imageUrlsString) {
     try {
       final urls = imageUrlsString.split('|');
@@ -144,11 +139,7 @@ class _ProductsListState extends State<ProductsList> {
 
         return GestureDetector(
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => ProductDetailsPage(product: product),
-              ),
-            );
+            // تم إزالة التنقل لصفحة التفاصيل
           },
           child: Card(
             elevation: 4,
@@ -185,8 +176,7 @@ class _ProductsListState extends State<ProductsList> {
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.all(12),
-                      child: // داخل Column الخاص بعرض تفاصيل المنتج
-                      Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(

@@ -1,6 +1,6 @@
+// my_product_details_page.dart - الإصدار المعدل
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MyProductDetailsPage extends StatefulWidget {
   final Map<String, dynamic> product;
@@ -24,7 +24,6 @@ class _MyProductDetailsPageState extends State<MyProductDetailsPage> {
   bool _isProcessing = false;
   bool _isFavorite = false;
   bool _isProcessingFavorite = false;
-  final _supabase = Supabase.instance.client;
 
   @override
   void initState() {
@@ -33,19 +32,10 @@ class _MyProductDetailsPageState extends State<MyProductDetailsPage> {
   }
 
   Future<void> _checkIfFavorite() async {
-    final user = _supabase.auth.currentUser;
-    if (user != null) {
-      final response = await _supabase
-          .from('favorites')
-          .select()
-          .eq('user_id', user.id)
-          .eq('product_id', widget.product['id'])
-          .maybeSingle();
-
-      setState(() {
-        _isFavorite = response != null;
-      });
-    }
+    // تم إزالة كود Supabase
+    setState(() {
+      _isFavorite = false;
+    });
   }
 
   Future<void> _toggleFavorite() async {
@@ -53,22 +43,7 @@ class _MyProductDetailsPageState extends State<MyProductDetailsPage> {
 
     setState(() => _isProcessingFavorite = true);
     try {
-      final user = _supabase.auth.currentUser!;
-
-      if (!_isFavorite) {
-        await _supabase.from('favorites').insert({
-          'user_id': user.id,
-          'product_id': widget.product['id'],
-          'created_at': DateTime.now().toIso8601String(),
-        });
-      } else {
-        await _supabase
-            .from('favorites')
-            .delete()
-            .eq('user_id', user.id)
-            .eq('product_id', widget.product['id']);
-      }
-
+      // تم إزالة كود Supabase
       setState(() => _isFavorite = !_isFavorite);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -82,11 +57,7 @@ class _MyProductDetailsPageState extends State<MyProductDetailsPage> {
   Future<void> _deleteProduct() async {
     setState(() => _isProcessing = true);
     try {
-      await _supabase
-          .from('products')
-          .delete()
-          .eq('id', widget.product['id']);
-
+      // تم إزالة كود Supabase
       widget.onDelete();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -97,6 +68,7 @@ class _MyProductDetailsPageState extends State<MyProductDetailsPage> {
     }
   }
 
+  // ... باقي الدوال بدون تغيير
   List<String> _getAllImageUrls(String imageUrlsString) {
     try {
       return imageUrlsString.split('|');
@@ -358,7 +330,6 @@ class _MyProductDetailsPageState extends State<MyProductDetailsPage> {
                         ],
                       ),
                     ),
-                  // أزرار التعديل والحذف
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     child: Row(

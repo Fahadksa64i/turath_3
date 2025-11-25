@@ -1,6 +1,6 @@
+// product_details_page.dart - الإصدار المعدل
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProductDetailsPage extends StatefulWidget {
   final Map<String, dynamic> product;
@@ -24,18 +24,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   }
 
   Future<void> _checkIfFavorite() async {
-    final supabase = Supabase.instance.client;
-    final user = supabase.auth.currentUser!;
-
-    final response = await supabase
-        .from('favorites')
-        .select()
-        .eq('user_id', user.id)
-        .eq('product_id', widget.product['id'])
-        .maybeSingle();
-
+    // تم إزالة كود Supabase
     setState(() {
-      _isFavorite = response != null;
+      _isFavorite = false;
     });
   }
 
@@ -46,24 +37,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       _isProcessingFavorite = true;
     });
 
-    final supabase = Supabase.instance.client;
-    final user = supabase.auth.currentUser!;
-
     try {
-      if (!_isFavorite) {
-        await supabase.from('favorites').insert({
-          'user_id': user.id,
-          'product_id': widget.product['id'],
-          'created_at': DateTime.now().toIso8601String(),
-        });
-      } else {
-        await supabase
-            .from('favorites')
-            .delete()
-            .eq('user_id', user.id)
-            .eq('product_id', widget.product['id']);
-      }
-
+      // تم إزالة كود Supabase
       setState(() {
         _isFavorite = !_isFavorite;
       });
@@ -78,6 +53,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     }
   }
 
+  // ... باقي الدوال بدون تغيير
   List<String> _getAllImageUrls(String imageUrlsString) {
     try {
       return imageUrlsString.split('|');

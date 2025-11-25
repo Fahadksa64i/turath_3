@@ -1,7 +1,6 @@
+// favorites_page.dart - الإصدار المعدل
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:test2/pages/product_details_page.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
@@ -30,21 +29,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
   Future<void> _fetchFavorites() async {
     try {
-      final supabase = Supabase.instance.client;
-      final user = supabase.auth.currentUser;
-
-      if (user != null) {
-        final response = await supabase
-            .from('favorites')
-            .select('products(*)')
-            .eq('user_id', user.id);
-
-        setState(() {
-          _favoriteProducts = List<Map<String, dynamic>>.from(
-            response.map((item) => item['products'] as Map<String, dynamic>),
-          );
-        });
-      }
+      // تم إزالة كود Supabase
+      setState(() {
+        _favoriteProducts = [];
+      });
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -54,6 +42,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
     }
   }
 
+  // ... باقي الدوال بدون تغيير
   String? _getFirstImageUrl(String imageUrlsString) {
     try {
       final urls = imageUrlsString.split('|');
@@ -104,7 +93,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
         ),
         leading: IconButton(icon: Icon(Icons.arrow_back,color: Colors.white),
           onPressed: () {
-          Navigator.of(context).pop();
+            Navigator.of(context).pop();
           },),
         centerTitle: true,
         backgroundColor: const Color(0xFF6C4422),
@@ -142,11 +131,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
         return GestureDetector(
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => ProductDetailsPage(product: product),
-              ),
-            );
+            // تم إزالة التنقل لصفحة التفاصيل
           },
           child: Card(
             elevation: 4,
@@ -194,7 +179,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          // إضافة موقع الإعلان
                           Row(
                             textDirection: TextDirection.rtl,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,7 +194,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
                             ],
                           ),
                           const SizedBox(height: 8),
-                          // إضافة وقت الإعلان
                           Row(
                             textDirection: TextDirection.rtl,
                             crossAxisAlignment: CrossAxisAlignment.start,

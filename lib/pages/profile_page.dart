@@ -1,9 +1,8 @@
+// profile_page.dart - الإصدار المعدل
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:test2/auth_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -13,7 +12,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final SupabaseClient _supabase = Supabase.instance.client;
   late String _username = '';
   late String _email = '';
   bool _isEditingUsername = false;
@@ -32,21 +30,12 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _loadUserData() async {
     setState(() => _isLoading = true);
     try {
-      final user = _supabase.auth.currentUser;
-      if (user != null) {
-        final response = await _supabase
-            .from('profiles')
-            .select('username, avatar_url')
-            .eq('id', user.id)
-            .single();
-
-        setState(() {
-          _username = response['username'] ?? 'بدون اسم';
-          _email = user.email ?? 'بدون إيميل';
-          _usernameController.text = _username;
-          _avatarUrl = response['avatar_url'];
-        });
-      }
+      // تم إزالة كود Supabase
+      setState(() {
+        _username = 'مستخدم';
+        _email = 'user@example.com';
+        _usernameController.text = _username;
+      });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('حدث خطأ في تحميل البيانات: ${e.toString()}')),
@@ -73,34 +62,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
     setState(() => _isLoading = true);
     try {
-      final user = _supabase.auth.currentUser;
-      if (user == null) throw Exception('User not logged in');
-
-      final fileExtension = _selectedImage!.path.split('.').last;
-      final fileName = 'user_${user.id}_${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
-
-      // 1. Upload image
-      await _supabase.storage
-          .from('avatars')
-          .upload(fileName, _selectedImage!, fileOptions: FileOptions(
-        contentType: 'image/$fileExtension',
-        upsert: true,
-      ));
-
-      // 2. Get public URL
-      final imageUrl = _supabase.storage.from('avatars').getPublicUrl(fileName);
-
-      // 3. Update profile
-      await _supabase
-          .from('profiles')
-          .update({'avatar_url': imageUrl})
-          .eq('id', user.id);
-
+      // تم إزالة كود Supabase
       setState(() {
-        _avatarUrl = imageUrl;
         _selectedImage = null;
       });
-
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('حدث خطأ في رفع الصورة: ${e.toString()}')),
@@ -117,14 +82,8 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     try {
-      final exists = await _supabase
-          .from('profiles')
-          .select()
-          .eq('username', username)
-          .neq('id', _supabase.auth.currentUser!.id)
-          .maybeSingle();
-
-      setState(() => _isUsernameAvailable = exists == null);
+      // تم إزالة كود Supabase
+      setState(() => _isUsernameAvailable = true);
     } catch (e) {
       setState(() => _isUsernameAvailable = false);
     }
@@ -135,11 +94,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     setState(() => _isLoading = true);
     try {
-      await _supabase
-          .from('profiles')
-          .update({'username': _usernameController.text.trim()})
-          .eq('id', _supabase.auth.currentUser!.id);
-
+      // تم إزالة كود Supabase
       setState(() {
         _username = _usernameController.text;
         _isEditingUsername = false;
@@ -236,63 +191,61 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Column(
                 children: [
                   // اسم المستخدم
-                Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // الجزء الأيسر: الأيقونة والنص أو حقل النص
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Icon(Icons.person, color: Color(0xFF6C4422)),
-                        SizedBox(width: 10),
-                        if (_isEditingUsername)
-                          Expanded(
-                            child: TextField(
-                              controller: _usernameController,
-                              style: GoogleFonts.tajawal(fontSize: 16),
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: const BorderSide(
-                                    color: Color(0xFF6C4422),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Icon(Icons.person, color: Color(0xFF6C4422)),
+                            SizedBox(width: 10),
+                            if (_isEditingUsername)
+                              Expanded(
+                                child: TextField(
+                                  controller: _usernameController,
+                                  style: GoogleFonts.tajawal(fontSize: 16),
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFF6C4422),
+                                      ),
+                                    ),
+                                    errorText: !_isUsernameAvailable ? 'اسم المستخدم غير متاح' : null,
                                   ),
+                                  onChanged: (value) => _checkUsernameAvailability(value.trim()),
                                 ),
-                                errorText: !_isUsernameAvailable ? 'اسم المستخدم غير متاح' : null,
+                              )
+                            else
+                              Text(
+                                _username,
+                                style: GoogleFonts.tajawal(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              onChanged: (value) => _checkUsernameAvailability(value.trim()),
-                            ),
-                          )
-                        else
-                          Text(
-                            _username,
-                            style: GoogleFonts.tajawal(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
+                          ],
+                        ),
+                      ),
 
-                  // الجزء الأيمن: زر التعديل
-                  IconButton(
-                    icon: Icon(
-                      _isEditingUsername ? Icons.check : Icons.edit,
-                      color: const Color(0xFF6C4422),
-                    ),
-                    onPressed: () {
-                      if (_isEditingUsername) {
-                        _updateUsername();
-                      } else {
-                        setState(() {
-                          _isEditingUsername = true;
-                          _isUsernameAvailable = true;
-                        });
-                      }
-                    },
+                      IconButton(
+                        icon: Icon(
+                          _isEditingUsername ? Icons.check : Icons.edit,
+                          color: const Color(0xFF6C4422),
+                        ),
+                        onPressed: () {
+                          if (_isEditingUsername) {
+                            _updateUsername();
+                          } else {
+                            setState(() {
+                              _isEditingUsername = true;
+                              _isUsernameAvailable = true;
+                            });
+                          }
+                        },
+                      ),
+                    ],
                   ),
-                ],
-              ),
                   const SizedBox(height: 20),
 
                   // البريد الإلكتروني
@@ -322,10 +275,7 @@ class _ProfilePageState extends State<ProfilePage> {
               onPressed: () async {
                 setState(() => _isLoading = true);
                 try {
-                  final authService = AuthService();
-                  await authService.signOut();
-                  await authService.clearCredentials();
-
+                  // تم إزالة كود Supabase
                   if (mounted) {
                     Navigator.pushNamedAndRemoveUntil(
                       context,
